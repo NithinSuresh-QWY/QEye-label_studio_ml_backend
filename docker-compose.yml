@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  ml-backend:
+    container_name: qeye-ml-backend
+    image: qeye/ml-backend:v0
+    build:
+      context: .
+      args:
+        TEST_ENV: ${TEST_ENV}
+    env_file:
+      - .env
+    environment:
+      - LOG_LEVEL=DEBUG
+      - WORKERS=1
+      - THREADS=8
+      - MODEL_DIR=/data/models
+      - MODEL_PATH=/app/best_model.pth
+      - MODEL_VERSION=qeye-efficientnet-b0
+      - ML_SERVER_BASIC_AUTH_USER=${ML_SERVER_BASIC_AUTH_USER:-}
+      - ML_SERVER_BASIC_AUTH_PASS=${ML_SERVER_BASIC_AUTH_PASS:-}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-${AWS_REGION:-ap-south-1}}
+      - AWS_NO_SIGN_REQUEST=${AWS_NO_SIGN_REQUEST:-}
+      # For non-s3:// task images. Do not use localhost inside Docker.
+      - LABEL_STUDIO_URL=${LABEL_STUDIO_URL:-}
+      - LABEL_STUDIO_API_KEY=${LABEL_STUDIO_API_KEY:-}
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./data/server:/data"
